@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import frc.lib.util.LimelightHelpers;
 import frc.robot.constants.Constants;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.SwerveTrackingSubsystem;
@@ -13,7 +14,7 @@ public class AutonAlignmentCommand extends TeleopSwerve{
     private double direction;
 
     public AutonAlignmentCommand(SwerveTrackingSubsystem t_Tracking, Swerve s_Swerve, double direction){
-        super(s_Swerve, () -> 0, () -> 0, () -> t_Tracking.getRotationAuton(0), () -> false);
+        super(s_Swerve, () -> 0, () -> 0, () -> t_Tracking.getRotationAuton(0), () -> false, () -> false, () -> false);
         addRequirements(s_Swerve, t_Tracking);
         this.t_Tracking = t_Tracking;
         this.s_Swerve = s_Swerve;

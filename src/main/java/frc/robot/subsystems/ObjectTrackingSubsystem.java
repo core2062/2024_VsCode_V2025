@@ -50,7 +50,9 @@ public class ObjectTrackingSubsystem extends SubsystemBase {
                     translationSup,
                     strafeSup,
                     () -> getRotation(0),
-                    robotCentricSup 
+                    robotCentricSup,
+                    () -> false,
+                    () -> false 
                 );
             return setPipelineCommand.andThen(rotateSwerveCommand);
         }

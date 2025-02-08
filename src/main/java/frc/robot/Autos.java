@@ -145,7 +145,7 @@ public class Autos extends SequentialCommandGroup {
             new LauncherAimCommand(l_LauncherSubsystem, () -> 33.5),
             new InstantCommand(() -> i_Intake.setFeedAndIntakeSpeed(0.5, 0.5)),
             swerveControllerCommand,
-            new TeleopSwerve(s_Swerve, () -> 0, () -> 0, () -> 0, () -> false).raceWith(new IntakeAssemblyCommand(i_Intake, 0.5, 0.5)),
+            new TeleopSwerve(s_Swerve, () -> 0, () -> 0, () -> 0, () -> false, () -> false, () -> false).raceWith(new IntakeAssemblyCommand(i_Intake, 0.5, 0.5)),
             new AutonShootCommand(i_Intake, l_LauncherSubsystem, 0.5, 0.6, 0.4)
         );
     }
@@ -222,7 +222,7 @@ public class Autos extends SequentialCommandGroup {
                 new LauncherAimCommand(l_LauncherSubsystem, () -> 33.5),
                 new InstantCommand(() -> i_Intake.setFeedAndIntakeSpeed(0.5, 0.5)),
                 swerveControllerCommand,
-                new IntakeAssemblyCommand(i_Intake, 0.5, 0.5).raceWith(new TeleopSwerve(s_Swerve, () -> 0, () -> 0, () -> 0, () -> false)),
+                new IntakeAssemblyCommand(i_Intake, 0.5, 0.5).raceWith(new TeleopSwerve(s_Swerve, () -> 0, () -> 0, () -> 0, () -> false, () -> false, () -> false)),
                 new AutonAlignmentCommand(t_Tracking, s_Swerve, -1),
                 new TrackingLauncherAimCommand(l_LauncherSubsystem, lt_TrackingSubsystem).raceWith(new FeedAssemblyCommand(i_Intake, 0.5, 2))
                 // new InstantCommand(() -> s_Swerve.setPose(Trajectory.getInitialPose())),
@@ -358,7 +358,7 @@ public class Autos extends SequentialCommandGroup {
             new LauncherAimCommand(l_LauncherSubsystem, () -> 33.5),
             new InstantCommand(() -> i_Intake.setFeedAndIntakeSpeed(0.5, 0.5)),
             swerveControllerCommand,
-            new IntakeAssemblyCommand(i_Intake, 0.5, 0.5).raceWith(new TeleopSwerve(s_Swerve, () -> 0, () -> 0, () -> 0, () -> false)),
+            new IntakeAssemblyCommand(i_Intake, 0.5, 0.5).raceWith(new TeleopSwerve(s_Swerve, () -> 0, () -> 0, () -> 0, () -> false, () -> false, () -> false)),
             new AutonAlignmentCommand(t_Tracking, s_Swerve, 1),
             new TrackingLauncherAimCommand(l_LauncherSubsystem, lt_TrackingSubsystem).raceWith(new FeedAssemblyCommand(i_Intake, 0.5, 2))
         );

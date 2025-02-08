@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import frc.lib.util.LimelightHelpers;
 import frc.lib.util.ModifiedSignalLogger;
 import frc.robot.SwerveModule;
 import frc.robot.constants.Constants;
@@ -20,10 +21,14 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.PathPlannerLogging;
+
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,10 +37,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class Swerve extends SubsystemBase {
+    private boolean doRejectUpdate;
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
-
+    SwerveDrivePoseEstimator m_Odometry = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), getPose());
+    
     public Swerve() {
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
@@ -186,6 +193,20 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic(){
+        LimelightHelpers.SetRobotOrientation("limelight-front", m_Odometry.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+        if(Math.abs(gyro.getAngularVelocityXDevice(false).getValueAsDouble()) > 720){ // if our angular velocity is greater than 720 degrees per second, ignore vision updates{
+            doRejectUpdate = true;
+        }
+        if(mt2.tagCount == 0){
+            doRejectUpdate = true;
+        }
+        if(!doRejectUpdate){
+        m_Odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        m_Odometry.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+        }
         swerveOdometry.update(getGyroYaw(), getModulePositions());
 
         for(SwerveModule mod : mSwerveMods){

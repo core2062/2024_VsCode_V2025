@@ -98,7 +98,9 @@ public class RobotContainer {
                 () -> -driver.getRawAxis(translationAxis), 
                 () -> -driver.getRawAxis(strafeAxis), 
                 () -> -driver.getRawAxis(rotationAxis), 
-                () -> robotCentric.getAsBoolean()
+                () -> robotCentric.getAsBoolean(),
+                () -> false,
+                () -> false
             )
         );
 
@@ -118,7 +120,7 @@ public class RobotContainer {
      * apear as you will have to manually enter the key value for the command.
      */
     private void registerCommands(){
-        NamedCommands.registerCommand("Pause Movement", new TeleopSwerve(s_Swerve, () -> 0, () -> 0, () -> 0, () -> false));
+        NamedCommands.registerCommand("Pause Movement", new TeleopSwerve(s_Swerve, () -> 0, () -> 0, () -> 0, () -> false, () -> false, () -> false));
         NamedCommands.registerCommand("Zero Launcher", new ZeroLauncherCommand(l_Launcher));
         NamedCommands.registerCommand("Launcher Aim Speaker Close", new LauncherAimCommand(l_Launcher, () -> 50));
         NamedCommands.registerCommand("Launcher Aim Pickup", new LauncherAimCommand(l_Launcher, () -> 33.5));
