@@ -41,7 +41,7 @@ public class Swerve extends SubsystemBase {
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
-    SwerveDrivePoseEstimator m_Odometry = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), getPose());
+    SwerveDrivePoseEstimator m_Odometry;
     
     public Swerve() {
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
@@ -56,6 +56,7 @@ public class Swerve extends SubsystemBase {
         };
         
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions());
+        m_Odometry = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), getModulePositions(), getPose());
         try{
             Constants.AutoConstants.config = RobotConfig.fromGUISettings();
       
@@ -191,22 +192,52 @@ public class Swerve extends SubsystemBase {
         setModuleStates(states);
     }
 
+    public void updateOdometry() {
+        m_Odometry.update(
+            getGyroYaw(), 
+            getModulePositions());
+
+        boolean doRejectUpdate = false;
+
+        LimelightHelpers.SetRobotOrientation("limelight-front", m_Odometry.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front");
+        System.out.println(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-front"));
+        if(Math.abs(gyro.getAngularVelocityZWorld().getValueAsDouble()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+        {
+            doRejectUpdate = true;
+        }
+        // if(mt2.tagCount == 0)
+        // {
+        //     doRejectUpdate = true;
+        // }
+        if(!doRejectUpdate)
+        {
+            m_Odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+            // m_Odometry.addVisionMeasurement(
+            //     mt2.pose,
+            //     mt2.timestampSeconds);
+        }
+    }
+
+
     @Override
     public void periodic(){
-        LimelightHelpers.SetRobotOrientation("limelight-front", m_Odometry.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-        if(Math.abs(gyro.getAngularVelocityXDevice(false).getValueAsDouble()) > 720){ // if our angular velocity is greater than 720 degrees per second, ignore vision updates{
-            doRejectUpdate = true;
-        }
-        if(mt2.tagCount == 0){
-            doRejectUpdate = true;
-        }
-        if(!doRejectUpdate){
-        m_Odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-        m_Odometry.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds);
-        }
+        updateOdometry();
+        
+        // LimelightHelpers.SetRobotOrientation("limelight-front", m_Odometry.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+        // if(Math.abs(gyro.getAngularVelocityXDevice(false).getValueAsDouble()) > 720){ // if our angular velocity is greater than 720 degrees per second, ignore vision updates{
+        //     doRejectUpdate = true;
+        // }
+        // if(mt2.tagCount == 0){
+        //     doRejectUpdate = true;
+        // }
+        // if(!doRejectUpdate){
+        // m_Odometry.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        // m_Odometry.addVisionMeasurement(
+        //     mt2.pose,
+        //     mt2.timestampSeconds);
+        // }
         swerveOdometry.update(getGyroYaw(), getModulePositions());
 
         for(SwerveModule mod : mSwerveMods){
